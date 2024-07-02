@@ -1,0 +1,4 @@
+node_modules
+mongo_db_data
+credentials.json
+build
