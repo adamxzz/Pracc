@@ -13,29 +13,82 @@ const ArticlePage = () => {
     const { articleId } = useParams();
     const { user, isLoading } = useUser();
  
+    // useEffect(() => {
+    //     const loadArticleInfo = async () => {
+    //         const token = user && await user.getIdToken();
+    //         const headers = token ? { authtoken: token } : {};
+    //         const response = await axios.get(`/api/articles/${articleId}`, { headers });
+    //         const newArticleInfo = response.data;
+    //         setArticleInfo(newArticleInfo);
+
+    //         try {
+    //             const response = await axios.get('http://localhost:8000/api/articles/learn-react');
+    //             console.log(response.data);
+    //           } catch (error) {
+    //             if (error.response) {
+    //               // The request was made and the server responded with a status code
+    //               // that falls out of the range of 2xx
+    //               console.error('Server responded with an error:', error.response.data);
+    //             } else if (error.request) {
+    //               // The request was made but no response was received
+    //               console.error('No response received:', error.request);
+    //             } else {
+    //               // Something happened in setting up the request that triggered an Error
+    //               console.error('Error setting up request:', error.message);
+    //             }
+    //           }
+    //     }
+ 
+    //     if (!isLoading) {
+    //         loadArticleInfo();
+    //     }
+
+    // }, [isLoading, user, articleId]);
+
     useEffect(() => {
         const loadArticleInfo = async () => {
-            const token = user && await user.getIdToken();
-            const headers = token ? { authtoken: token } : {};
-            const response = await axios.get(`/api/articles/${articleId}`, { headers });
-            const newArticleInfo = response.data;
-            setArticleInfo(newArticleInfo);
-        }
- 
+            try {
+                const token = user && await user.getIdToken();
+                const headers = token ? { authtoken: token } : {};
+                const response = await axios.get(`/api/articles/${articleId}`, { headers });
+                const newArticleInfo = response.data;
+                setArticleInfo(newArticleInfo);
+            } catch (error) {
+                if (error.response) {
+                    console.error('Server responded with an error:', error.response.data);
+                } else if (error.request) {
+                    console.error('No response received:', error.request);
+                } else {
+                    console.error('Error setting up request:', error.message);
+                }
+            }
+        };
+
         if (!isLoading) {
             loadArticleInfo();
         }
-
-    }, [isLoading, user]);
+    }, [isLoading, user, articleId]);
  
     const article = articles.find(article => article.name === articleId);
+    // const addUpvote = async () => {
+    //     const token = user && await user.getIdToken();
+    //     const headers = token ? { authtoken: token } : {};
+    //     const response = await axios.put(`/api/articles/${articleId}/upvote`, null, { headers });
+    //     const updatedArticle = response.data;
+    //     setArticleInfo(updatedArticle);
+    // }
+
     const addUpvote = async () => {
         const token = user && await user.getIdToken();
         const headers = token ? { authtoken: token } : {};
-        const response = await axios.put(`/api/articles/${articleId}/upvote`, null, { headers });
-        const updatedArticle = response.data;
-        setArticleInfo(updatedArticle);
-    }
+        try {
+            const response = await axios.put(`http://localhost:8000/api/articles/${articleId}/upvote`, null, { headers });
+            const updatedArticle = response.data;
+            setArticleInfo(updatedArticle);
+        } catch (error) {
+            console.error('Failed to add upvote:', error);
+        }
+    };
  
     if (!article) {
         return <NotFoundPage />
